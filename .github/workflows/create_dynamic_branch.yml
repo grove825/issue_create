@@ -15,7 +15,13 @@ jobs:
           echo "::set-output name=branch_name::$branch_name"
       - name: Checkout Repository
         uses: actions/checkout@v2
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
       - name: Create Branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Retrieve the branch name from the previous step's output
           branch_name=${{ steps.set-branch-name.outputs.branch_name }}
