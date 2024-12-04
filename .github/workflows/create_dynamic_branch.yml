@@ -1,7 +1,7 @@
 name: Create Dynamic Branch on New Issue
 on:
   issues:
-    types: [ assigned ]
+    types: [assigned]
 jobs:
   create-branch:
     name: "Create Dynamic Branch"
@@ -13,7 +13,6 @@ jobs:
           # Generate a dynamic branch name based on the current date and time
           branch_name=$(echo "issue-${{ github.event.issue.number }} ${{ github.event.issue.title }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
           echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
-#           echo "::set-output name=branch_name::$branch_name"
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Create Branch
@@ -32,8 +31,8 @@ jobs:
         run: |
           issue_number=${{ github.event.issue.number }}
           branch_name=${{ steps.set-branch-name.outputs.branch_name }}
-          repo_url=https://github.com/${{ github.repository }}
-          branch_url=$repo_url/tree/$branch_name
+          repo_url=https://api.github.com/repos/${{ github.repository }}
+          branch_url=https://github.com/${{ github.repository }}/tree/$branch_name
           curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" \
                -H "Accept: application/vnd.github.v3+json" \
                $repo_url/issues/$issue_number/comments \
