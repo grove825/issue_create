@@ -12,13 +12,9 @@ jobs:
         run: |
           # Generate a dynamic branch name based on the current date and time
           branch_name="${{ github.event.issue.title }}"
-          echo "::set-output name=branch_name::$branch_name"
+          echo "{branch_name}={$branch_name}" >> $GITHUB_STATE
       - name: Checkout Repository
-        uses: actions/checkout@v2
-      - name: Set up Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        uses: actions/checkout@v4
       - name: Create Branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
