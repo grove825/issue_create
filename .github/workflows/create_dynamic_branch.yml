@@ -22,7 +22,7 @@ jobs:
         run: |
           # Retrieve the branch name from the previous step's output
           branch_name=${{ steps.set-branch-name.outputs.branch_name }}
-          git switch development
+          git checkout development
           git checkout -b $branch_name
           git push --set-upstream origin $branch_name
       - name: Add Comment to Issue
