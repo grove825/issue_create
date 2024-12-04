@@ -1,7 +1,7 @@
 name: Create Dynamic Branch on New Issue
 on:
   issues:
-    types: [opened]
+    types: [ assigned ]
 jobs:
   create-branch:
     name: "Create Dynamic Branch"
