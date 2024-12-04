@@ -15,6 +15,9 @@ jobs:
           echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Checkout Development Branch
+        run: |
+          git checkout development
       - name: Create Branch
         if: ${{ github.event.action == 'assigned' }}
         env:
@@ -22,7 +25,6 @@ jobs:
         run: |
           # Retrieve the branch name from the previous step's output
           branch_name=${{ steps.set-branch-name.outputs.branch_name }}
-          git checkout development
           git checkout -b $branch_name
           git push --set-upstream origin $branch_name
       - name: Add Comment to Issue
