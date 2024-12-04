@@ -11,7 +11,7 @@ jobs:
         id: set-branch-name
         run: |
           # Generate a dynamic branch name based on the current date and time
-          branch_name="dynamic-branch-$(date +'%Y%m%d%H%M%S')"
+          branch_name="${{ github.event.issue.title }}"
           echo "::set-output name=branch_name::$branch_name"
       - name: Checkout Repository
         uses: actions/checkout@v2
