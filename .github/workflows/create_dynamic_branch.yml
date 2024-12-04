@@ -15,6 +15,9 @@ jobs:
           echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Fetch Development Branch
+        run: |
+          git fetch origin development:development
       - name: Checkout Development Branch
         run: |
           git checkout development
