@@ -11,12 +11,13 @@ jobs:
         id: set-branch-name
         run: |
           # Generate a dynamic branch name based on the current date and time
-          branch_name=$(echo "${{ github.event.issue.title }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
+          branch_name=$(echo "issue-${{ github.event.issue.number }} ${{ github.event.issue.title }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
           echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
 #           echo "::set-output name=branch_name::$branch_name"
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Create Branch
+        if: ${{ github.event.action == 'assigned' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -24,3 +25,16 @@ jobs:
           branch_name=${{ steps.set-branch-name.outputs.branch_name }}
           git checkout -b $branch_name
           git push --set-upstream origin $branch_name
+      - name: Add Comment to Issue
+        if: ${{ github.event.action == 'assigned' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          issue_number=${{ github.event.issue.number }}
+          branch_name=${{ steps.set-branch-name.outputs.branch_name }}
+          repo_url=https://github.com/${{ github.repository }}
+          branch_url=$repo_url/tree/$branch_name
+          curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+               -H "Accept: application/vnd.github.v3+json" \
+               $repo_url/issues/$issue_number/comments \
+               -d '{"body": "Branch created: ['$branch_name']('$branch_url')"}'
