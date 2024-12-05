@@ -17,7 +17,7 @@ jobs:
         uses: actions-tools/yaml-outputs@v2
         id: yaml
         with:
-          file-path: '.github/issue-config.yaml'
+          file-path: '.github/issue-config.yml'
       - name: Read Issue Config
         run: |
             echo "autoCloseIssue=$steps.yaml.outputs.autoCloseIssue" >> $GITHUB_ENV
