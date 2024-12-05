@@ -9,14 +9,15 @@ on:
 jobs:
   create-branch:
     if: contains(github.event.comment.body, '/CIB') || github.event.action == 'assigned'
-    runs-on: ubuntu-latest
+    runs-on: mikefarah/yq
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install yq
-        run: |
-          pip install yq
+#       - name: Install yq
+#         run: |
+#           sudo apt-get update
+#           sudo apt-get install -y yq
       - name: Read Issue Config
         id: read-issue-config
         run: |
@@ -58,7 +59,7 @@ jobs:
                -d '{"body": "Branch created: ['$branch_name']('$branch_url')"}'
   close-issue:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    runs-on: mikefarah/yq
     steps:
       - name: Read Issue Config
         run: |
