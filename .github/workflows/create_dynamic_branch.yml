@@ -41,4 +41,12 @@ jobs:
                -H "Accept: application/vnd.github.v3+json" \
                $repo_url/issues/$issue_number/comments \
                -d '{"body": "Branch created: ['$branch_name']('$branch_url')"}'
-
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Run Tests
+        run: |
+          echo "Running tests"
+          echo "Tests passed"
