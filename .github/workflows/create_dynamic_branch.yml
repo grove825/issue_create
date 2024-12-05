@@ -58,10 +58,15 @@ jobs:
                $repo_url/issues/$issue_number/comments \
                -d '{"body": "Branch created: ['$branch_name']('$branch_url')"}'
   close-issue:
-    if: github.event.pull_request.merged == true && env.autoCloseIssue == 'true'
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
+      - name: Read Issue Config
+        run: |
+          autoCloseIssue=$(yq e '.autoCloseIssue' .github/issue-config.yml)
+          echo "autoCloseIssue=$autoCloseIssue" >> $GITHUB_ENV
       - name: Close Issue
+        if: env.autoCloseIssue == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
