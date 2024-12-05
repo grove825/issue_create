@@ -13,11 +13,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Read Issue Config
+      - name: Set YAML Outputs
         uses: actions-tools/yaml-outputs@v2
         id: yaml
         with:
           file-path: '.github/issue-config.yaml'
+      - name: Read Issue Config
         run: |
             echo "autoCloseIssue=$steps.yaml.outputs.autoCloseIssue" >> $GITHUB_ENV
             echo "defaultBranch=$steps.yaml.outputs.defaultBranch" >> $GITHUB_ENV
