@@ -1,20 +1,21 @@
-name: Create Dynamic Branch on New Issue
+name: Create Branch on Comment or Issue Assignment
 on:
+  issue_comment:
+    types: [created]
   issues:
     types: [assigned]
 jobs:
   create-branch:
-    name: "Create Dynamic Branch"
+    if: contains(github.event.comment.body, '/CIB') || github.event.action == 'assigned'
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: Set Branch Name
         id: set-branch-name
         run: |
-          # Generate a dynamic branch name based on the current date and time
-          branch_name=$(echo "issue-${{ github.event.issue.number }} ${{ github.event.issue.title }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
+          branch_name=$(echo "issue-${{ github.event.issue.number }}-comment" | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
           echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
-      - name: Checkout Repository
-        uses: actions/checkout@v4
       - name: Fetch Development Branch
         run: |
           git fetch origin development:development
@@ -22,16 +23,13 @@ jobs:
         run: |
           git checkout development
       - name: Create Branch
-        if: ${{ github.event.action == 'assigned' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Retrieve the branch name from the previous step's output
           branch_name=${{ steps.set-branch-name.outputs.branch_name }}
           git checkout -b $branch_name
           git push --set-upstream origin $branch_name
       - name: Add Comment to Issue
-        if: ${{ github.event.action == 'assigned' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
