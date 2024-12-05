@@ -14,7 +14,7 @@ jobs:
       - name: Set Branch Name
         id: set-branch-name
         run: |
-          branch_name=$(echo "issue-${{ github.event.issue.number }}-comment" | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
+          branch_name=$(echo "issue-${{ github.event.issue.number }} ${{ github.event.issue.title }}" | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
           echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
       - name: Fetch Development Branch
         run: |
