@@ -13,10 +13,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: Install yq
         run: |
           sudo apt-get update
           sudo apt-get install -y yq
+      - name: Read Issue Config
         id: read-issue-config
         run: |
           autoCloseIssue=$(yq e '.autoCloseIssue' .github/issue-config.yml)
