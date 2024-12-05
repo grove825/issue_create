@@ -19,14 +19,26 @@ jobs:
 #           sudo apt-get update
 #           sudo apt-get install -y yq
       - name: Read Issue Config
-        id: read-issue-config
-        run: |
-          autoCloseIssue=$(yq e '.autoCloseIssue' .github/issue-config.yml)
-          defaultBranch=$(yq e '.defaultBranch' .github/issue-config.yml)
-          gitSafeReplacementChar=$(yq e '.gitSafeReplacementChar' .github/issue-config.yml)
-          echo "autoCloseIssue=$autoCloseIssue" >> $GITHUB_ENV
-          echo "defaultBranch=$defaultBranch" >> $GITHUB_ENV
-          echo "gitSafeReplacementChar=$gitSafeReplacementChar" >> $GITHUB_ENV
+#         id: read-issue-config
+#         run: |
+#           autoCloseIssue=$(yq e '.autoCloseIssue' .github/issue-config.yml)
+#           defaultBranch=$(yq e '.defaultBranch' .github/issue-config.yml)
+#           gitSafeReplacementChar=$(yq e '.gitSafeReplacementChar' .github/issue-config.yml)
+#           echo "autoCloseIssue=$autoCloseIssue" >> $GITHUB_ENV
+#           echo "defaultBranch=$defaultBranch" >> $GITHUB_ENV
+#           echo "gitSafeReplacementChar=$gitSafeReplacementChar" >> $GITHUB_ENV
+      - uses: actions-tools/yaml-outputs@v2
+        id: yaml
+        with:
+          file-path: '.github/issue-config.yaml'
+      - run: |
+          echo "autoCloseIssue=$steps.yaml.outputs.autoCloseIssue" >> $GITHUB_ENV
+          echo "defaultBranch=$steps.yaml.outputs.defaultBranch" >> $GITHUB_ENV
+          echo "gitSafeReplacementChar=$steps.yaml.outputs.gitSafeReplacementChar" >> $GITHUB_ENV
+#           echo "${{ steps.yaml.outputs.root__parent__child_1 }}"
+#           echo "${{ steps.yaml.outputs.root__parent__child_2 }}"
+#           echo "${{ env.root__parent__child_1 }}"
+#           echo "${{ env.root__parent__child_2 }}"
       - name: Set Branch Name
         id: set-branch-name
         run: |
