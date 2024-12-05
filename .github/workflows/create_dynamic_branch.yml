@@ -4,6 +4,8 @@ on:
     types: [created]
   issues:
     types: [assigned]
+  pull_request:
+    types: [closed]
 jobs:
   create-branch:
     if: contains(github.event.comment.body, '/CIB') || github.event.action == 'assigned'
@@ -41,12 +43,20 @@ jobs:
                -H "Accept: application/vnd.github.v3+json" \
                $repo_url/issues/$issue_number/comments \
                -d '{"body": "Branch created: ['$branch_name']('$branch_url')"}'
-  test:
+  close-issue:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      - name: Run Tests
+      - name: Close Issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Running tests"
-          echo "Tests passed"
+          if [ "${{ github.event.pull_request.merged }}" = "true" ]; then
+            issue_number=$(echo "${{ github.event.pull_request.head.ref }}" | grep -oP '(?<=issue-)\d+')
+            if [ -n "$issue_number" ]; then
+              curl -X PATCH -H "Authorization: Bearer $GITHUB_TOKEN" \
+                   -H "Accept: application/vnd.github.v3+json" \
+                   https://api.github.com/repos/${{ github.repository }}/issues/$issue_number \
+                   -d '{"state": "closed"}'
+            fi
+          fi
