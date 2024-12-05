@@ -20,9 +20,9 @@ jobs:
           file-path: '.github/issue-config.yml'
       - name: Read Issue Config
         run: |
-            echo "autoCloseIssue=$steps.yaml.outputs.autoCloseIssue" >> $GITHUB_ENV
-            echo "defaultBranch=$steps.yaml.outputs.defaultBranch" >> $GITHUB_ENV
-            echo "gitSafeReplacementChar=$steps.yaml.outputs.gitSafeReplacementChar" >> $GITHUB_ENV
+            echo "autoCloseIssue=${{ steps.yaml.outputs.autoCloseIssue }}" >> $GITHUB_ENV
+            echo "defaultBranch=${{ steps.yaml.outputs.defaultBranch }}" >> $GITHUB_ENV
+            echo "gitSafeReplacementChar=${{ steps.yaml.outputs.gitSafeReplacementChar }}" >> $GITHUB_ENV
       - name: Set Branch Name
         id: set-branch-name
         run: |
