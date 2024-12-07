@@ -1,0 +1,10 @@
+-rrequirements.txt
+black
+build
+coverage[toml]
+mypy
+pytest
+pre-commit
+ruff
+twine
+uv

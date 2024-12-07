@@ -16,19 +16,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = []
-
-[project.optional-dependencies]
-dev = [
-    "black",
-    "build",
-    "coverage[toml]",
-    "mypy",
-    "pytest",
-    "pre-commit",
-    "ruff",
-    "twine",
-]
 
 [tool.setuptools.packages.find]
 where = ["application_name"]
