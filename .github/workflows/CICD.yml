@@ -119,7 +119,6 @@ jobs:
   pytest-full:
     runs-on: ubuntu-24.04
     needs:
-      - pre-commit
       - lint
     name: Run tests Python
     steps:
