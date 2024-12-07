@@ -4,266 +4,230 @@ on:
   push: ~
   pull_request: ~
 
-
 permissions:
   contents: read
   issues: write
 
 env:
-  CACHE_VERSION: 11
-  UV_CACHE_VERSION: 1
-  MYPY_CACHE_VERSION: 9
   DEFAULT_PYTHON: "3.13"
-  ALL_PYTHON_VERSIONS: "['3.12', '3.13']"
   PRE_COMMIT_CACHE: ~/.cache/pre-commit
-  UV_CACHE_DIR: /tmp/uv-cache
 
 jobs:
-    pre-commit:
-      name: Prepare pre-commit base
-      runs-on: ubuntu-24.04
-      steps:
-        - name: Check out code from GitHub
-          uses: actions/checkout@v4.2.2
-        - name: Set up Python ${{ env.DEFAULT_PYTHON }}
-          id: python
-          uses: actions/setup-python@v5.3.0
-          with:
-            python-version: ${{ env.DEFAULT_PYTHON }}
-            check-latest: true
-        - name: Restore base Python virtual environment
-          id: cache-venv
-          uses: actions/cache@v4.2.0
-          with:
-            path: venv
-            key: >-
-              ${{ runner.os }}-${{ steps.python.outputs.python-version }}-venv
-        - name: Create Python virtual environment
-          if: steps.cache-venv.outputs.cache-hit != 'true'
-          run: |
-            python -m venv venv
-            . venv/bin/activate
-            python --version
-            pip install uv
-            uv pip install -r requirements-dev.txt
-        - name: Restore pre-commit environment from cache
-          id: cache-precommit
-          uses: actions/cache@v4.2.0
-          with:
-            path: ${{ env.PRE_COMMIT_CACHE }}
-            lookup-only: true
-            key: >-
-              ${{ runner.os }}-${{ steps.python.outputs.python-version }}-precommit
-        - name: Install pre-commit dependencies
-          if: steps.cache-precommit.outputs.cache-hit != 'true'
-          run: |
-            . venv/bin/activate
-            pre-commit install-hooks
-    lint-ruff-format:
-      name: Check ruff-format
-      runs-on: ubuntu-24.04
-      needs:
-        - pre-commit
-      steps:
-        - name: Check out code from GitHub
-          uses: actions/checkout@v4.2.2
-        - name: Set up Python ${{ env.DEFAULT_PYTHON }}
-          uses: actions/setup-python@v5.3.0
-          id: python
-          with:
-            python-version: ${{ env.DEFAULT_PYTHON }}
-            check-latest: true
-        - name: Restore base Python virtual environment
-          id: cache-venv
-          uses: actions/cache/restore@v4.2.0
-          with:
-            path: venv
-            fail-on-cache-miss: true
-            key: >-
-              ${{ runner.os }}-${{ steps.python.outputs.python-version }}-venv
-        - name: Restore pre-commit environment from cache
-          id: cache-precommit
-          uses: actions/cache/restore@v4.2.0
-          with:
-            path: ${{ env.PRE_COMMIT_CACHE }}
-            fail-on-cache-miss: true
-            key: >-
-              ${{ runner.os }}-${{ steps.python.outputs.python-version }}-precommit
-        - name: Run ruff-format
-          run: |
-            . venv/bin/activate
-            pre-commit run --hook-stage manual ruff-format --all-files --show-diff-on-failure
-          env:
-            RUFF_OUTPUT_FORMAT: github
-    lint-ruff:
-      name: Check ruff
-      runs-on: ubuntu-24.04
-      needs:
-        - pre-commit
-      steps:
-        - name: Check out code from GitHub
-          uses: actions/checkout@v4.2.2
-        - name: Set up Python ${{ env.DEFAULT_PYTHON }}
-          uses: actions/setup-python@v5.3.0
-          id: python
-          with:
-            python-version: ${{ env.DEFAULT_PYTHON }}
-            check-latest: true
-        - name: Restore base Python virtual environment
-          id: cache-venv
-          uses: actions/cache/restore@v4.2.0
-          with:
-            path: venv
-            fail-on-cache-miss: true
-            key: >-
-              ${{ runner.os }}-${{ steps.python.outputs.python-version }}-venv
-        - name: Restore pre-commit environment from cache
-          id: cache-precommit
-          uses: actions/cache/restore@v4.2.0
-          with:
-            path: ${{ env.PRE_COMMIT_CACHE }}
-            fail-on-cache-miss: true
-            key: >-
-              ${{ runner.os }}-${{ steps.python.outputs.python-version }}-precommit
-        - name: Run ruff
-          run: |
-            . venv/bin/activate
-            pre-commit run --hook-stage manual ruff --all-files --show-diff-on-failure
-          env:
-            RUFF_OUTPUT_FORMAT: github
-    mypy:
-      name: Check mypy
-      runs-on: ubuntu-24.04
-      needs:
-        - pre-commit
-      steps:
-        - name: Check out code from GitHub
-          uses: actions/checkout@v4.2.2
-        - name: Set up Python ${{ env.DEFAULT_PYTHON }}
-          uses: actions/setup-python@v5.3.0
-          id: python
-          with:
-            python-version: ${{ env.DEFAULT_PYTHON }}
-            check-latest: true
-#         - name: Generate partial mypy restore key
-#           id: generate-mypy-key
-#           run: |
-#             mypy_version=$(cat requirements_test.txt | grep mypy | cut -d '=' -f 3)
-#             echo "version=1" >> $GITHUB_OUTPUT
-#             echo "key=mypy-${{ env.MYPY_CACHE_VERSION }}-$(date -u '+%Y-%m-%dT%H:%M:%s')" >> $GITHUB_OUTPUT
-        - name: Restore base Python virtual environment
-          id: cache-venv
-          uses: actions/cache/restore@v4.2.0
-          with:
-            path: venv
-            fail-on-cache-miss: true
-            key: >-
-              ${{ runner.os }}-${{ steps.python.outputs.python-version }}-venv
-#         - name: Restore mypy cache
-#           uses: actions/cache@v4.2.0
-#           with:
-#             path: .mypy_cache
-#             key: >-
-#               ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
-#               steps.generate-mypy-key.outputs.key }}
-#             restore-keys: |
-#               ${{ runner.os }}-${{ steps.python.outputs.python-version }}-mypy-${{
-#               env.MYPY_CACHE_VERSION }}-${{ steps.generate-mypy-key.outputs.version }}
-        - name: Restore pre-commit environment from cache
-          id: cache-precommit
-          uses: actions/cache/restore@v4.2.0
-          with:
-            path: ${{ env.PRE_COMMIT_CACHE }}
-            fail-on-cache-miss: true
-            key: >-
-              ${{ runner.os }}-${{ steps.python.outputs.python-version }}-precommit
-        - name: Run Mypy
-          run: |
-            . venv/bin/activate
-            pre-commit run --hook-stage manual mypy --all-files
+  setup:
+    name: Set up Python and cache
+    runs-on: ubuntu-24.04
+    outputs:
+      python-version: ${{ steps.python.outputs.python-version }}
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.2.2
+      - name: Set up Python ${{ env.DEFAULT_PYTHON }}
+        id: python
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+          check-latest: true
+      - name: Restore base Python virtual environment
+        id: cache-venv
+        uses: actions/cache@v4.2.0
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-venv
+      - name: Create Python virtual environment
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          python -m venv venv
+          . venv/bin/activate
+          python --version
+          pip install uv
+          uv pip install -r requirements-dev.txt
+      - name: Restore pre-commit environment from cache
+        id: cache-precommit
+        uses: actions/cache@v4.2.0
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          lookup-only: true
+          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-precommit
+      - name: Install pre-commit dependencies
+        if: steps.cache-precommit.outputs.cache-hit != 'true'
+        run: |
+          . venv/bin/activate
+          pre-commit install-hooks
 
+  pre-commit:
+    name: Prepare pre-commit base
+    runs-on: ubuntu-24.04
+    needs: setup
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.2.2
+      - name: Set up Python ${{ needs.setup.outputs.python-version }}
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: ${{ needs.setup.outputs.python-version }}
+          check-latest: true
+      - name: Restore base Python virtual environment
+        uses: actions/cache@v4.2.0
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
+      - name: Restore pre-commit environment from cache
+        uses: actions/cache@v4.2.0
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-precommit
 
-    lint-other:
-      name: Check other linters
-      runs-on: ubuntu-24.04
-      needs:
-        - pre-commit
-      steps:
-        - name: Check out code from GitHub
-          uses: actions/checkout@v4.2.2
-        - name: Set up Python ${{ env.DEFAULT_PYTHON }}
-          uses: actions/setup-python@v5.3.0
-          id: python
-          with:
-            python-version: ${{ env.DEFAULT_PYTHON }}
-            check-latest: true
-        - name: Restore base Python virtual environment
-          id: cache-venv
-          uses: actions/cache/restore@v4.2.0
-          with:
-            path: venv
-            fail-on-cache-miss: true
-            key: >-
-              ${{ runner.os }}-${{ steps.python.outputs.python-version }}-venv
-        - name: Restore pre-commit environment from cache
-          id: cache-precommit
-          uses: actions/cache/restore@v4.2.0
-          with:
-            path: ${{ env.PRE_COMMIT_CACHE }}
-            fail-on-cache-miss: true
-            key: >-
-              ${{ runner.os }}-${{ steps.python.outputs.python-version }}-precommit
+  lint-ruff-format:
+    name: Check ruff-format
+    runs-on: ubuntu-24.04
+    needs: pre-commit
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.2.2
+      - name: Set up Python ${{ needs.setup.outputs.python-version }}
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: ${{ needs.setup.outputs.python-version }}
+          check-latest: true
+      - name: Restore base Python virtual environment
+        uses: actions/cache@v4.2.0
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
+      - name: Restore pre-commit environment from cache
+        uses: actions/cache@v4.2.0
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-precommit
+      - name: Run ruff-format
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual ruff-format --all-files --show-diff-on-failure
+        env:
+          RUFF_OUTPUT_FORMAT: github
 
-        - name: Run check-json
-          run: |
-            . venv/bin/activate
-            pre-commit run --hook-stage manual check-json --all-files
+  lint-ruff:
+    name: Check ruff
+    runs-on: ubuntu-24.04
+    needs: pre-commit
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.2.2
+      - name: Set up Python ${{ needs.setup.outputs.python-version }}
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: ${{ needs.setup.outputs.python-version }}
+          check-latest: true
+      - name: Restore base Python virtual environment
+        uses: actions/cache@v4.2.0
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
+      - name: Restore pre-commit environment from cache
+        uses: actions/cache@v4.2.0
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-precommit
+      - name: Run ruff
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual ruff --all-files --show-diff-on-failure
+        env:
+          RUFF_OUTPUT_FORMAT: github
 
-        - name: Run codespell
-          run: |
-            . venv/bin/activate
-            pre-commit run --show-diff-on-failure --hook-stage manual codespell --all-files
+  mypy:
+    name: Check mypy
+    runs-on: ubuntu-24.04
+    needs: pre-commit
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.2.2
+      - name: Set up Python ${{ needs.setup.outputs.python-version }}
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: ${{ needs.setup.outputs.python-version }}
+          check-latest: true
+      - name: Restore base Python virtual environment
+        uses: actions/cache@v4.2.0
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
+      - name: Restore pre-commit environment from cache
+        uses: actions/cache@v4.2.0
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-precommit
+      - name: Run Mypy
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual mypy --all-files
 
-    pytest-full:
-      runs-on: ubuntu-24.04
-      needs:
-        - pre-commit
-        - lint-other
-        - lint-ruff
-        - lint-ruff-format
-        - mypy
-      name: >-
-        Run tests Python
-      steps:
-        - name: Check out code from GitHub
-          uses: actions/checkout@v4.2.2
-        - name: Set up Python ${{ env.DEFAULT_PYTHON }}
-          id: python
-          uses: actions/setup-python@v5.3.0
-          with:
-            python-version: ${{ env.DEFAULT_PYTHON }}
-            check-latest: true
-        - name: Restore full Python ${{ matrix.python-version }} virtual environment
-          id: cache-venv
-          uses: actions/cache/restore@v4.2.0
-          with:
-            path: venv
-            fail-on-cache-miss: true
-            key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-venv
-        - name: Run pytest
-          timeout-minutes: 60
-          id: pytest-full
-          env:
-            PYTHONDONTWRITEBYTECODE: 1
-          run: |
-            . venv/bin/activate
-            python --version
-            python -m coverage run -m pytest --junitxml=pytest-results.xml
-            coverage xml -o coverage.xml
-            python -m coverage report --fail-under=100
-        - name: Upload coverage artifact
-          uses: actions/upload-artifact@v4.4.3
-          with:
-            name: coverage
-            path: coverage.xml
-            overwrite: true
+  lint-other:
+    name: Check other linters
+    runs-on: ubuntu-24.04
+    needs: pre-commit
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.2.2
+      - name: Set up Python ${{ needs.setup.outputs.python-version }}
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: ${{ needs.setup.outputs.python-version }}
+          check-latest: true
+      - name: Restore base Python virtual environment
+        uses: actions/cache@v4.2.0
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
+      - name: Restore pre-commit environment from cache
+        uses: actions/cache@v4.2.0
+        with:
+          path: ${{ env.PRE_COMMIT_CACHE }}
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-precommit
+      - name: Run check-json
+        run: |
+          . venv/bin/activate
+          pre-commit run --hook-stage manual check-json --all-files
+      - name: Run codespell
+        run: |
+          . venv/bin/activate
+          pre-commit run --show-diff-on-failure --hook-stage manual codespell --all-files
+
+  pytest-full:
+    runs-on: ubuntu-24.04
+    needs:
+      - pre-commit
+      - lint-other
+      - lint-ruff
+      - lint-ruff-format
+      - mypy
+    name: Run tests Python
+    steps:
+      - name: Check out code from GitHub
+        uses: actions/checkout@v4.2.2
+      - name: Set up Python ${{ needs.setup.outputs.python-version }}
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: ${{ needs.setup.outputs.python-version }}
+          check-latest: true
+      - name: Restore full Python ${{ needs.setup.outputs.python-version }} virtual environment
+        uses: actions/cache@v4.2.0
+        with:
+          path: venv
+          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
+      - name: Run pytest
+        timeout-minutes: 60
+        env:
+          PYTHONDONTWRITEBYTECODE: 1
+        run: |
+          . venv/bin/activate
+          python --version
+          python -m coverage run -m pytest --junitxml=pytest-results.xml
+          coverage xml -o coverage.xml
+          python -m coverage report --fail-under=100
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: coverage
+          path: coverage.xml
+          overwrite: true
