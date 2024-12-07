@@ -176,23 +176,16 @@ jobs:
               ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
                 needs.info.outputs.pre-commit_cache_key }}
 
-        - name: Register check-json problem matcher
-          run: |
-            echo "::add-matcher::.github/workflows/matchers/check-json.json"
         - name: Run check-json
           run: |
             . venv/bin/activate
             pre-commit run --hook-stage manual check-json --all-files
 
         - name: Run prettier (fully)
-          if: needs.info.outputs.test_full_suite == 'true'
           run: |
             . venv/bin/activate
             pre-commit run --hook-stage manual prettier --all-files
 
-        - name: Register codespell problem matcher
-          run: |
-            echo "::add-matcher::.github/workflows/matchers/codespell.json"
         - name: Run codespell
           run: |
             . venv/bin/activate
