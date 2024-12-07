@@ -245,7 +245,7 @@ jobs:
         timeout-minutes: 60
         strategy:
           matrix:
-            python-version: ${{ fromJson(vars.ALL_PYTHON_VERSIONS) }}
+            python-version: [3.12, 3.13]
         steps:
           - name: Check out code from GitHub
             uses: actions/checkout@v4.2.2
@@ -427,7 +427,7 @@ jobs:
         fail-fast: false
         matrix:
           group: ${{ fromJson(needs.info.outputs.test_groups) }}
-          python-version: ${{ fromJson(vars.ALL_PYTHON_VERSIONS) }}
+          python-version: [3.12, 3.13]
       name: >-
         Run tests Python ${{ matrix.python-version }} (${{ matrix.group }})
       steps:
