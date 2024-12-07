@@ -410,13 +410,6 @@ jobs:
 #
     pytest-full:
       runs-on: ubuntu-24.04
-      if: |
-        (github.event_name != 'push' || github.event.repository.full_name == 'home-assistant/core')
-        && github.event.inputs.lint-only != 'true'
-        && github.event.inputs.pylint-only != 'true'
-        && github.event.inputs.mypy-only != 'true'
-        && github.event.inputs.audit-licenses-only != 'true'
-        && needs.info.outputs.test_full_suite == 'true'
       needs:
         - base
         - lint-other
@@ -427,7 +420,7 @@ jobs:
         fail-fast: false
         matrix:
           group: ${{ fromJson(needs.info.outputs.test_groups) }}
-          python-version: [3.12, 3.13]
+          python-version: ${{ fromJson(vars.ALL_PYTHON_VERSIONS) }}
       name: >-
         Run tests Python ${{ matrix.python-version }} (${{ matrix.group }})
       steps:
