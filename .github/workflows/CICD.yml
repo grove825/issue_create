@@ -181,79 +181,55 @@ jobs:
             . venv/bin/activate
             pre-commit run --hook-stage manual check-json --all-files
 
-        - name: Run prettier (fully)
-          run: |
-            . venv/bin/activate
-            pre-commit run --hook-stage manual prettier --all-files
-
         - name: Run codespell
           run: |
             . venv/bin/activate
             pre-commit run --show-diff-on-failure --hook-stage manual codespell --all-files
 
-#
-#     base:
-#         name: Prepare dependencies
-#         runs-on: ubuntu-24.04
-#         needs: info
-#         timeout-minutes: 60
-#         strategy:
-#           matrix:
-#             python-version: ${{ fromJSON(needs.info.outputs.python_versions) }}
-#         steps:
-#           - name: Check out code from GitHub
-#             uses: actions/checkout@v4.2.2
-#           - name: Set up Python ${{ matrix.python-version }}
-#             id: python
-#             uses: actions/setup-python@v5.3.0
-#             with:
-#               python-version: ${{ matrix.python-version }}
-#               check-latest: true
-#           - name: Generate partial uv restore key
-#             id: generate-uv-key
-#             run: |
-#               uv_version=$(cat requirements.txt | grep uv | cut -d '=' -f 3)
-#               echo "version=${uv_version}" >> $GITHUB_OUTPUT
-#               echo "key=uv-${{ env.UV_CACHE_VERSION }}-${uv_version}-${{
-#                 env.HA_SHORT_VERSION }}-$(date -u '+%Y-%m-%dT%H:%M:%s')" >> $GITHUB_OUTPUT
-#           - name: Restore base Python virtual environment
-#             id: cache-venv
-#             uses: actions/cache@v4.2.0
-#             with:
-#               path: venv
-#               key: >-
-#                 ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
-#                 needs.info.outputs.python_cache_key }}
-#           - name: Restore uv wheel cache
-#             if: steps.cache-venv.outputs.cache-hit != 'true'
-#             uses: actions/cache@v4.2.0
-#             with:
-#               path: ${{ env.UV_CACHE_DIR }}
-#               key: >-
-#                 ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
-#                 steps.generate-uv-key.outputs.key }}
-#               restore-keys: |
-#                 ${{ runner.os }}-${{ steps.python.outputs.python-version }}-uv-${{
-#                 env.UV_CACHE_VERSION }}-${{ steps.generate-uv-key.outputs.version }}-${{
-#                 env.HA_SHORT_VERSION }}-
-#           - name: Install additional OS dependencies
-#             if: steps.cache-venv.outputs.cache-hit != 'true'
-#             run: |
-#               sudo rm /etc/apt/sources.list.d/microsoft-prod.list
-#               sudo apt-get update
-#               sudo apt-get -y install \
-#                 bluez \
-#                 ffmpeg \
-#                 libturbojpeg \
-#                 libavcodec-dev \
-#                 libavdevice-dev \
-#                 libavfilter-dev \
-#                 libavformat-dev \
-#                 libavutil-dev \
-#                 libgammu-dev \
-#                 libswresample-dev \
-#                 libswscale-dev \
-#                 libudev-dev
+
+    base:
+        name: Prepare dependencies
+        runs-on: ubuntu-24.04
+        needs: info
+        timeout-minutes: 60
+        strategy:
+          matrix:
+            python-version: ${{ fromJSON(needs.info.outputs.python_versions) }}
+        steps:
+          - name: Check out code from GitHub
+            uses: actions/checkout@v4.2.2
+          - name: Set up Python ${{ matrix.python-version }}
+            id: python
+            uses: actions/setup-python@v5.3.0
+            with:
+              python-version: ${{ matrix.python-version }}
+              check-latest: true
+          - name: Generate partial uv restore key
+            id: generate-uv-key
+            run: |
+              uv_version=$(cat requirements.txt | grep uv | cut -d '=' -f 3)
+              echo "version=${uv_version}" >> $GITHUB_OUTPUT
+              echo "key=uv-${{ env.UV_CACHE_VERSION }}-${uv_version}-${{
+                env.HA_SHORT_VERSION }}-$(date -u '+%Y-%m-%dT%H:%M:%s')" >> $GITHUB_OUTPUT
+          - name: Restore base Python virtual environment
+            id: cache-venv
+            uses: actions/cache@v4.2.0
+            with:
+              path: venv
+              key: >-
+                ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
+                needs.info.outputs.python_cache_key }}
+          - name: Restore uv wheel cache
+            if: steps.cache-venv.outputs.cache-hit != 'true'
+            uses: actions/cache@v4.2.0
+            with:
+              path: ${{ env.UV_CACHE_DIR }}
+              key: >-
+                ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{
+                steps.generate-uv-key.outputs.key }}
+              restore-keys: |
+                ${{ runner.os }}-${{ steps.python.outputs.python-version }}-uv-${{
+                env.UV_CACHE_VERSION }}-${{ steps.generate-uv-key.outputs.version }}
 #           - name: Create Python virtual environment
 #             if: steps.cache-venv.outputs.cache-hit != 'true'
 #             run: |
