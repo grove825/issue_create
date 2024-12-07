@@ -447,35 +447,21 @@ jobs:
           run: |
             . venv/bin/activate
             python --version
-            set -o pipefail
-            cov_params=()
-            cov_params+=(--cov-report=xml)
-
-            echo "Test group ${{ matrix.group }}: $(sed -n "${{ matrix.group }},1p" pytest_buckets.txt)"
-            python3 -b -X dev -m pytest \
-              -qq \
-              --timeout=9 \
-              --durations=10 \
-              --numprocesses auto \
-              --snapshot-details \
-              --dist=loadfile \
-              ${cov_params[@]} \
-              -o console_output_style=count \
-              -p no:sugar \
-              $(sed -n "${{ matrix.group }},1p" pytest_buckets.txt) \
-                2>&1 | tee pytest-${{ matrix.python-version }}-${{ matrix.group }}.txt
+            python -m coverage run -m pytest --junitxml=pytest-results.xml
+            coverage xml -o coverage.xml
+            python -m coverage report --fail-under=100
         - name: Upload pytest output
           if: success() || failure() && steps.pytest-full.conclusion == 'failure'
           uses: actions/upload-artifact@v4.4.3
           with:
-            name: pytest-${{ github.run_number }}-${{ matrix.python-version }}-${{ matrix.group }}
+            name: pytest-${{ github.run_number }}-${{ matrix.python-version }}
             path: pytest-*.txt
             overwrite: true
         - name: Upload coverage artifact
           if: needs.info.outputs.skip_coverage != 'true'
           uses: actions/upload-artifact@v4.4.3
           with:
-            name: coverage-${{ matrix.python-version }}-${{ matrix.group }}
+            name: coverage-${{ matrix.python-version }}
             path: coverage.xml
             overwrite: true
 #         - name: Remove pytest_buckets
