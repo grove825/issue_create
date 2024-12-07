@@ -78,10 +78,13 @@ jobs:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-precommit
 
-  lint-ruff-format:
-    name: Check ruff-format
+  lint:
+    name: Run linters
     runs-on: ubuntu-24.04
     needs: pre-commit
+    strategy:
+      matrix:
+        linter: [ruff-format, ruff, mypy, check-json, codespell]
     steps:
       - name: Check out code from GitHub
         uses: actions/checkout@v4.2.2
@@ -100,108 +103,18 @@ jobs:
         with:
           path: ${{ env.PRE_COMMIT_CACHE }}
           key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-precommit
-      - name: Run ruff-format
+      - name: Run ${{ matrix.linter }}
         run: |
           . venv/bin/activate
-          pre-commit run --hook-stage manual ruff-format --all-files --show-diff-on-failure
+          pre-commit run --hook-stage manual ${{ matrix.linter }} --all-files --show-diff-on-failure
         env:
           RUFF_OUTPUT_FORMAT: github
-
-  lint-ruff:
-    name: Check ruff
-    runs-on: ubuntu-24.04
-    needs: pre-commit
-    steps:
-      - name: Check out code from GitHub
-        uses: actions/checkout@v4.2.2
-      - name: Set up Python ${{ needs.setup.outputs.python-version }}
-        uses: actions/setup-python@v5.3.0
-        with:
-          python-version: ${{ needs.setup.outputs.python-version }}
-          check-latest: true
-      - name: Restore base Python virtual environment
-        uses: actions/cache@v4.2.0
-        with:
-          path: venv
-          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
-      - name: Restore pre-commit environment from cache
-        uses: actions/cache@v4.2.0
-        with:
-          path: ${{ env.PRE_COMMIT_CACHE }}
-          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-precommit
-      - name: Run ruff
-        run: |
-          . venv/bin/activate
-          pre-commit run --hook-stage manual ruff --all-files --show-diff-on-failure
-        env:
-          RUFF_OUTPUT_FORMAT: github
-
-  mypy:
-    name: Check mypy
-    runs-on: ubuntu-24.04
-    needs: pre-commit
-    steps:
-      - name: Check out code from GitHub
-        uses: actions/checkout@v4.2.2
-      - name: Set up Python ${{ needs.setup.outputs.python-version }}
-        uses: actions/setup-python@v5.3.0
-        with:
-          python-version: ${{ needs.setup.outputs.python-version }}
-          check-latest: true
-      - name: Restore base Python virtual environment
-        uses: actions/cache@v4.2.0
-        with:
-          path: venv
-          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
-      - name: Restore pre-commit environment from cache
-        uses: actions/cache@v4.2.0
-        with:
-          path: ${{ env.PRE_COMMIT_CACHE }}
-          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-precommit
-      - name: Run Mypy
-        run: |
-          . venv/bin/activate
-          pre-commit run --hook-stage manual mypy --all-files
-
-  lint-other:
-    name: Check other linters
-    runs-on: ubuntu-24.04
-    needs: pre-commit
-    steps:
-      - name: Check out code from GitHub
-        uses: actions/checkout@v4.2.2
-      - name: Set up Python ${{ needs.setup.outputs.python-version }}
-        uses: actions/setup-python@v5.3.0
-        with:
-          python-version: ${{ needs.setup.outputs.python-version }}
-          check-latest: true
-      - name: Restore base Python virtual environment
-        uses: actions/cache@v4.2.0
-        with:
-          path: venv
-          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
-      - name: Restore pre-commit environment from cache
-        uses: actions/cache@v4.2.0
-        with:
-          path: ${{ env.PRE_COMMIT_CACHE }}
-          key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-precommit
-      - name: Run check-json
-        run: |
-          . venv/bin/activate
-          pre-commit run --hook-stage manual check-json --all-files
-      - name: Run codespell
-        run: |
-          . venv/bin/activate
-          pre-commit run --show-diff-on-failure --hook-stage manual codespell --all-files
 
   pytest-full:
     runs-on: ubuntu-24.04
     needs:
       - pre-commit
-      - lint-other
-      - lint-ruff
-      - lint-ruff-format
-      - mypy
+      - lint
     name: Run tests Python
     steps:
       - name: Check out code from GitHub
