@@ -1,3 +1,3 @@
 autoCloseIssue: true
 defaultBranch: 'development'
-gitSafeReplacementChar: '-'
+gitSafeReplacementChar: '_'

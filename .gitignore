@@ -1,3 +1,8 @@
 .idea
-/venv/
+venv
+.venv
+__pycache__
+/.coverage
+**/*.egg-info/
+/.vscode/
 /docs/build/

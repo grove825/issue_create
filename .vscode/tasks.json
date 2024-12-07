@@ -1,0 +1,75 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Copy Script to Raspberry Pi",
+            "type": "shell",
+            "command": "scp",
+            "args": [
+                "${workspaceFolder}/main.py",
+                "pi@100.90.31.75:~/main.py"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Copy Unit Test to Raspberry Pi",
+            "type": "shell",
+            "command": "scp",
+            "args": [
+                "${workspaceFolder}/test_units.py",
+                "pi@100.90.31.75:~/test_units.py"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Copy Requirements to Raspberry Pi",
+            "type": "shell",
+            "command": "scp",
+            "args": [
+                "${workspaceFolder}/requirements.txt",
+                "pi@100.90.31.75:~/requirements.txt"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Setup Python Environment on Raspberry Pi",
+            "type": "shell",
+            "command": "ssh",
+            "args": [
+                "pi@100.90.31.75",
+                "python3 -m venv ~/myenv && ~/myenv/bin/pip install -r ~/requirements.txt --no-input"
+            ],
+            "dependsOn": "Copy Requirements to Raspberry Pi",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Script on Raspberry Pi (NO DEBUG)",
+            "type": "shell",
+            "command": "ssh",
+            "args": [
+                "pi@100.90.31.75",
+                "~/myenv/bin/python3 ~/main.py"
+            ],
+            "dependsOn": [
+                "Copy Script to Raspberry Pi",
+                "Setup Python Environment on Raspberry Pi"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Unit Tests on Raspberry Pi",
+            "type": "shell",
+            "command": "ssh",
+            "args": [
+                "pi@100.90.31.75",
+                "~/myenv/bin/python3 -m unittest ~/test_units.py"
+            ],
+            "dependsOn": [
+                "Copy Script to Raspberry Pi",
+                "Copy Unit Test to Raspberry Pi",
+                "Setup Python Environment on Raspberry Pi"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

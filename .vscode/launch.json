@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Remote Debug",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "100.90.31.75",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "/home/pi/CodeHackathon"
+                }
+            ],
+            "args": [
+                "-Xfrozen_modules=off"
+            ]
+        }
+    ]
+}
