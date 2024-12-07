@@ -103,6 +103,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 "**/__init__.py"= ["D104"]
 "tests/**"= ["A", "ANN", "D", "PLR2004", "PT", "S101"]
 "application_name/main.py"= ["T201", "ANN"]
+"docs/**"= ["INP001"]
 
 [tool.mypy]
 check_untyped_defs = true

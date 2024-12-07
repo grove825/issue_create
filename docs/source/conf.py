@@ -1,18 +1,18 @@
-# Configuration file for the Sphinx documentation builder.
+"""Configuration file for the Sphinx documentation builder."""
 
 # -- Project information
-project = 'Issue Action'
-copyright = ''
-author = 'Fabian'
+project = "Issue Action"
+copyright = ""  # noqa: A001
+author = "Fabian"
 
-release = '0.1'
-version = '0.1.0'
+release = "0.1"
+version = "0.1.0"
 
 # -- General configuration
 extensions = [
-    'sphinx.ext.autosummary',
+    "sphinx.ext.autosummary",
 ]
 
 # -- Options for HTML output
-html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+html_theme = "sphinx_rtd_theme"
+html_static_path = ["_static"]
