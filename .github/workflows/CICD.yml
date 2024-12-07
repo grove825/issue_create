@@ -18,13 +18,18 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.13
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - name: Install dependencies
         run: |
           python -m venv .venv
           source .venv/bin/activate
           pip install -r requirements-dev.txt
-        cache:
-          paths: .venv
 
   unit-test:
     runs-on: ubuntu-latest
