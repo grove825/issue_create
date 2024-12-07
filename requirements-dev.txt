@@ -3,8 +3,8 @@ black
 build
 coverage[toml]
 mypy
-pytest
 pre-commit
+pytest
 ruff
 twine
 uv
