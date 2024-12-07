@@ -54,3 +54,10 @@ repos:
             - --fix
         - id: ruff-format
           types_or: [ python, toml ]
+    - repo: https://github.com/codespell-project/codespell
+      rev: v2.3.0
+      hooks:
+        - id: codespell
+          args:
+            - --quiet-level=2
+          exclude_types: [csv, json, html]
