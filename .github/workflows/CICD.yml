@@ -94,7 +94,7 @@ jobs:
           python-version: ${{ needs.setup.outputs.python-version }}
           check-latest: true
       - name: Restore base Python virtual environment
-        uses: actions/cache@v4.2.0
+        uses: actions/cache/restore@v4.2.0
         with:
           path: venv
           key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
@@ -125,7 +125,7 @@ jobs:
           python-version: ${{ needs.setup.outputs.python-version }}
           check-latest: true
       - name: Restore full Python ${{ needs.setup.outputs.python-version }} virtual environment
-        uses: actions/cache@v4.2.0
+        uses: actions/cache/restore@v4.2.0
         with:
           path: venv
           key: ${{ runner.os }}-${{ needs.setup.outputs.python-version }}-venv
