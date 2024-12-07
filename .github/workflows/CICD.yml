@@ -49,7 +49,7 @@ jobs:
             . venv/bin/activate
             python --version
             pip install uv
-            uv pip install requirements-dev.txt
+            uv pip install -r requirements-dev.txt
         - name: Restore pre-commit environment from cache
           id: cache-precommit
           uses: actions/cache@v4.2.0
