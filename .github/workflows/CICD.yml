@@ -67,7 +67,7 @@ jobs:
       - name: Set up Python ${{ needs.setup.outputs.python-version }}
         uses: actions/setup-python@v5.3.0
         with:
-          python-version: ${{ env.DEFAULT_PYTHON }}
+          python-version: ${{ needs.setup.outputs.python-version }}
           check-latest: true
       - name: Restore base Python virtual environment
         uses: actions/cache@v4.2.0
@@ -97,7 +97,7 @@ jobs:
       - name: Set up Python ${{ needs.setup.outputs.python-version }}
         uses: actions/setup-python@v5.3.0
         with:
-          python-version: ${{ env.DEFAULT_PYTHON }}
+          python-version: ${{ needs.setup.outputs.python-version }}
           check-latest: true
       - name: Restore full Python virtual environment
         uses: actions/cache@v4.2.0
