@@ -245,7 +245,7 @@ jobs:
         timeout-minutes: 60
         strategy:
           matrix:
-            python-version: ${{ fromJson(env.ALL_PYTHON_VERSIONS) }}
+            python-version: ${{ fromJson(vars.ALL_PYTHON_VERSIONS) }}
         steps:
           - name: Check out code from GitHub
             uses: actions/checkout@v4.2.2
