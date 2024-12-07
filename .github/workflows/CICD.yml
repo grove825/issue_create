@@ -17,12 +17,12 @@ jobs:
     name: Set up Python and cache
     runs-on: ubuntu-24.04
     outputs:
-      python-version: ${{ steps.python.outputs.python-version }}
+      python-version: ${{ steps.set-python.outputs.python-version }}
     steps:
       - name: Check out code from GitHub
         uses: actions/checkout@v4.2.2
       - name: Set up Python ${{ env.DEFAULT_PYTHON }}
-        id: python
+        id: set-python
         uses: actions/setup-python@v5.3.0
         with:
           python-version: ${{ env.DEFAULT_PYTHON }}
@@ -64,7 +64,7 @@ jobs:
     steps:
       - name: Check out code from GitHub
         uses: actions/checkout@v4.2.2
-      - name: Set up Python ${{ needs.setup.outputs.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5.3.0
         with:
           python-version: ${{ needs.setup.outputs.python-version }}
@@ -94,7 +94,7 @@ jobs:
     steps:
       - name: Check out code from GitHub
         uses: actions/checkout@v4.2.2
-      - name: Set up Python ${{ needs.setup.outputs.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5.3.0
         with:
           python-version: ${{ needs.setup.outputs.python-version }}
