@@ -190,7 +190,6 @@ jobs:
     base:
         name: Prepare dependencies
         runs-on: ubuntu-24.04
-        needs: info
         timeout-minutes: 60
         strategy:
           matrix:
