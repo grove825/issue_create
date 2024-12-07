@@ -427,7 +427,7 @@ jobs:
         fail-fast: false
         matrix:
           group: ${{ fromJson(needs.info.outputs.test_groups) }}
-          python-version: ${{ fromJson(needs.info.outputs.python_versions) }}
+          python-version: [3.12, 3.13]
       name: >-
         Run tests Python ${{ matrix.python-version }} (${{ matrix.group }})
       steps:
